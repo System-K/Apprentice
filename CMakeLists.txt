@@ -1,0 +1,16 @@
+# CMake build for the SKSE-Hotfixes Linux/clang-cl toolchain. Mirrors xmake.lua (upstream build untouched).
+cmake_minimum_required(VERSION 3.21)
+project(Apprentice VERSION 0.1.0 LANGUAGES CXX)
+find_package(CommonLibSSE CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_path(SIMPLEINI_INCLUDE_DIRS "SimpleIni.h" REQUIRED)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
+add_commonlibsse_plugin(${PROJECT_NAME} NAME apprentice AUTHOR lambdacdm VERSION ${PROJECT_VERSION} SOURCES ${SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME apprentice)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+# Linux: the source includes "simpleini.h", vcpkg installs "SimpleIni.h" (case-insensitive on Windows).
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/case-alias")
+file(CREATE_LINK "${SIMPLEINI_INCLUDE_DIRS}/SimpleIni.h" "${CMAKE_BINARY_DIR}/case-alias/simpleini.h" SYMBOLIC)
+target_include_directories(${PROJECT_NAME} PRIVATE include ${SIMPLEINI_INCLUDE_DIRS} "${CMAKE_BINARY_DIR}/case-alias")
+target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.h)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)

@@ -1,0 +1,1 @@
+{ "name": "apprentice", "version-string": "1.1.0", "dependencies": ["commonlibsse-ng", "simpleini", "nlohmann-json"] }
